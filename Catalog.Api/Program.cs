@@ -1,5 +1,6 @@
 using Catalog.Application;
 using Catalog.Application.Features.Products.Commands.CreateProduct;
+using Catalog.Application.Features.Products.Queries.GetAllProducts;
 using Catalog.Domain.Entities;
 using JasperFx;
 using JasperFx.Events.Daemon;
@@ -21,6 +22,12 @@ var app = builder.Build();
 app.MapPost("/products", async (CreateProductCommand command, IMediator mediator) =>
 {
     var response = await mediator.Send(command);
+    return Results.Ok(response);
+});
+
+app.MapGet("/products", async (IMediator mediator) =>
+{
+    var response = await mediator.Send(new GetAllProductsRequest());
     return Results.Ok(response);
 });
 
