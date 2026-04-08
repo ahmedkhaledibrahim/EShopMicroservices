@@ -1,3 +1,5 @@
+using Carter;
+using Catalog.Api.Middlewares;
 using Catalog.Application;
 using Catalog.Application.Features.Products.Commands.CreateProduct;
 using Catalog.Application.Features.Products.Queries.GetAllProducts;
@@ -17,26 +19,25 @@ builder.Services.AddMarten(options => {
     options.AutoCreateSchemaObjects = AutoCreate.All;
     options.DatabaseSchemaName = "eshop";
     options.Schema.For<Product>().Identity(x => x.ID);
+}).UseDirtyTrackedSessions();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddCarter();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 var app = builder.Build();
 
-app.MapPost("/products", async (CreateProductCommand command, IMediator mediator) =>
-{
-    var response = await mediator.Send(command);
-    return Results.Ok(response);
-});
-
-app.MapGet("/products", async (IMediator mediator) =>
-{
-    var response = await mediator.Send(new GetAllProductsRequest());
-    return Results.Ok(response);
-});
-app.MapGet("/products/{id}", async (IMediator mediator, Guid id) =>
-{
-    var response = await mediator.Send(new GetProductByIDRequest { 
-      ID = id
-    });
-    return Results.Ok(response);
-});
+app.UseErrorHandlerMiddleware();
+app.UseCors();
+app.UseSwagger();
+app.UseSwaggerUI();
+app.MapCarter();
 
 app.Run();
