@@ -17,6 +17,7 @@ namespace Catalog.Application.Features.Products.Queries.GetProductByID
             var product = await _querySession.Query<Product>().FirstOrDefaultAsync(x => x.ID == request.ID);
             if (product == null) return null;
             return new GetProductByIDResponse { ID = product.ID, Name = product.Name, Description = product.Description, Price = product.Price, Categories = product.Categories, ImageFile = product.ImageFile };
+        
         }
     }
 }
