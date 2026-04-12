@@ -15,20 +15,26 @@ services:
       retries: 5
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-  catalog-api:
-    container_name: catalog-api
+  catalog.api:
+    image: ${DOCKER_REGISTRY-}catalogapi
     build:
       context: .
       dockerfile: Catalog.Api/Dockerfile
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=eshop;Username=postgres;Password=nopolice
     depends_on:
       postgres:
         condition: service_healthy
     ports:
       - "6000:8080"
-
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: eshop-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
 volumes:
   postgres_data:
+   

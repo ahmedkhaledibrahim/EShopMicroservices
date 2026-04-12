@@ -1,9 +1,11 @@
 ﻿using Carter;
 using Catalog.Application.Features.Products.Commands.CreateProduct;
+using Catalog.Application.Features.Products.Commands.DeleteProduct;
 using Catalog.Application.Features.Products.Commands.UpdateProduct;
 using Catalog.Application.Features.Products.Queries.GetAllProducts;
 using Catalog.Application.Features.Products.Queries.GetProductByID;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.Api.Modules
 {
@@ -29,6 +31,11 @@ namespace Catalog.Api.Modules
             group.MapPut("/", async (IMediator mediator, UpdateProductCommand command) =>
             {
                 var result = await mediator.Send(command);
+                return Results.Ok(result);
+            });
+            group.MapDelete("/{id}", async (IMediator mediator,[FromRoute] Guid id) =>
+            {
+                var result = await mediator.Send(new DeleteProductCommand { ID = id });
                 return Results.Ok(result);
             });
         }

@@ -15,6 +15,7 @@ namespace Catalog.Application
             services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+                cfg.AddOpenBehavior(typeof(Behaviours.LoggingBehaviour<,>));
             });
             services.AddMapster();
             return services;
