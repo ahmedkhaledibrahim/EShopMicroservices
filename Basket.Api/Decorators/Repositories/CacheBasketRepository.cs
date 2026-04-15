@@ -26,13 +26,22 @@ namespace Basket.Api.Decorators.Repositories
 
         public override async Task<ShoppingCart> GetShoppingCartAsync(string username)
         {
+            var cachedCart = await _cacheService.GetAsync<ShoppingCart>(username);
+            if(cachedCart != null)
+            {
+                return cachedCart;
+            }
             var cart = await _repository.GetShoppingCartAsync(username);
+            if(cart != null) await _cacheService.SetAsync<ShoppingCart>(username, cart, TimeSpan.FromMinutes(5));
             return cart;
         }
 
-        public override Task<ShoppingCart> UpdateShoppingCartAsync(ShoppingCart cart)
+        public override async Task<ShoppingCart> UpdateShoppingCartAsync(ShoppingCart cart)
         {
-            throw new NotImplementedException();
+            await _repository.UpdateShoppingCartAsync(cart);
+            await _cacheService.DeleteAsync<ShoppingCart>(cart.Username);
+            await _cacheService.SetAsync<ShoppingCart>(cart.Username, cart, TimeSpan.FromMinutes(5));
+            return cart;
         }
     }
 }

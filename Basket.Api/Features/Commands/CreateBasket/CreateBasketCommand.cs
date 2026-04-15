@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Basket.Api.Dtos;
+using MediatR;
 
 namespace Basket.Api.Features.Commands.CreateBasket
 {
@@ -8,11 +9,5 @@ namespace Basket.Api.Features.Commands.CreateBasket
         public List<ShoppingCartItemDto> Items { get; init; }
     }
 
-    public class ShoppingCartItemDto
-    {
-        public Guid ProductID { get; init; }
-        public string ProductName { get; set; }
-        public int Quantity { get; init; }
-        public decimal Price { get; init; }
-    }
+   
 }

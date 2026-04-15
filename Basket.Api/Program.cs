@@ -1,6 +1,7 @@
 using Basket.Api.Data.Seeding;
 using Basket.Api.Extensions;
 using Basket.Api.Features.Commands.CreateBasket;
+using Carter;
 using JasperFx;
 using Marten;
 using MediatR;
@@ -25,6 +26,7 @@ builder.Services.AddServices();
 if (builder.Environment.IsDevelopment()) { 
    builder.Services.InitializeMartenWith(new InitialSeeding(InitialDataSets.shoppingCarts));
 }
+builder.Services.AddCarter();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
@@ -40,11 +42,7 @@ var app = builder.Build();
 app.UseCors();
 app.UseSwagger();
 app.UseSwaggerUI();
-app.MapPost("/baskets", async (IMediator mediator, CreateBasketCommand command) =>
-{
-    var result = await mediator.Send(command);
-    return Results.Ok(result);
-});
+app.MapCarter();
 
 app.Run();
 
