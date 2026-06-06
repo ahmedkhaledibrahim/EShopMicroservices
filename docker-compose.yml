@@ -88,9 +88,17 @@ services:
     depends_on:
       - catalog-postgres
       - basket-postgres 
+  discount.grpc:
+    image: ${DOCKER_REGISTRY-}discountgrpc
+    build:
+      context: .
+      dockerfile: Discount.gRPC/Dockerfile
+
 volumes:
   postgres_catalog_data:
   postgres_basket_data:
   redis_data:
   redisinsight_data:
+  discountdata:
    
+
