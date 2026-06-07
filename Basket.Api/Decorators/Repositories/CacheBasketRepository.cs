@@ -19,9 +19,13 @@ namespace Basket.Api.Decorators.Repositories
             return createdCart;
         }
 
-        public override Task DeleteShoppingCartAsync(string username)
+        public override async Task DeleteShoppingCartAsync(string username)
         {
-            throw new NotImplementedException();
+            var cachedCart = await _cacheService.GetAsync<ShoppingCart>(username);
+            if (cachedCart != null) { 
+              await _cacheService.DeleteAsync<ShoppingCart>(username);
+            }
+            await _repository.DeleteShoppingCartAsync(username);
         }
 
         public override async Task<ShoppingCart> GetShoppingCartAsync(string username)

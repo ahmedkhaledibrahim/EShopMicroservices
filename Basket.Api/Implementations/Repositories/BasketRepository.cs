@@ -22,7 +22,14 @@ namespace Basket.Api.Implementations.Repositories
 
         public async Task DeleteShoppingCartAsync(string username)
         {
-            _session.DeleteWhere<ShoppingCart>(c => c.Username == username);
+            var existing = await _session.Query<ShoppingCart>()
+                .FirstOrDefaultAsync(c => c.Username == username);
+
+            if (existing != null)
+            {
+                _session.Delete(existing);
+            }
+
             await _session.SaveChangesAsync();
         }
 

@@ -22,7 +22,9 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     var configuration = builder.Configuration.GetConnectionString("Redis");
     return ConnectionMultiplexer.Connect(configuration);
 });
+builder.Services.AddGrpcClientConfigurations(builder.Configuration);
 builder.Services.AddServices();
+
 if (builder.Environment.IsDevelopment()) { 
    builder.Services.InitializeMartenWith(new InitialSeeding(InitialDataSets.shoppingCarts));
 }
@@ -38,6 +40,7 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 var app = builder.Build();
 app.UseCors();
 app.UseSwagger();
