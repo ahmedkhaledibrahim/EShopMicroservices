@@ -4,7 +4,6 @@ using Basket.Api.Repositories;
 using Discount.gRPC.Protos;
 using Mapster;
 using MediatR;
-using NetTopologySuite.Index.HPRtree;
 
 namespace Basket.Api.Features.Commands.CreateBasket
 {
@@ -43,3 +42,4 @@ namespace Basket.Api.Features.Commands.CreateBasket
         }
     }
 }
+ 

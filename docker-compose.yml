@@ -65,7 +65,7 @@ services:
   basket.api:
     image: ${DOCKER_REGISTRY-}basketapi
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      - GrpcSettings__DiscountUrl=http://discount.grpc:8080
     build:
       context: .
       dockerfile: Basket.Api/Dockerfile
@@ -73,6 +73,8 @@ services:
       basket-postgres:
         condition: service_healthy
       basket-redis:
+        condition: service_started
+      discount.grpc:
         condition: service_started
     ports:
       - "6061:8080"
