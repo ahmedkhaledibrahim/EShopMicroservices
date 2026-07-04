@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Ordering.Domain.Models;
+using Ordering.Domain.ValueObjects;
 
 namespace Ordering.Persistence.Configurations
 {
@@ -8,6 +9,9 @@ namespace Ordering.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {
+            builder.HasKey(x => x.ID);
+            builder.Property(c => c.ID).IsRequired().HasConversion(productId => productId.Value, dbProductId => ProductId<Guid>.Of(dbProductId));
+
             builder.Property(c => c.Name)
                 .IsRequired()
                 .HasMaxLength(100);
