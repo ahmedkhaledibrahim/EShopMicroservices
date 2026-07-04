@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Ordering.Domain.Aggregates;
 using Ordering.Domain.Enums;
+using Ordering.Domain.Models;
 using Ordering.Domain.ValueObjects;
 
 namespace Ordering.Persistence.Configurations
@@ -21,6 +22,11 @@ namespace Ordering.Persistence.Configurations
                id => id.Value,
                dbId => CustomerId<Guid>.Of(dbId)
            );
+
+            builder.HasOne<Customer>()         
+                .WithMany()      
+                .HasForeignKey(o => o.CustomerId)
+                .IsRequired();
 
             builder.Property(o => o.Status)
             .IsRequired()
