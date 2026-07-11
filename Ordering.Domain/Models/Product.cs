@@ -10,9 +10,10 @@ namespace Ordering.Domain.Models
         public string Name { get; private set; }
         public Price Price { get; private set; }
 
-        public static Product Create(string name, Price price) {
+        public static Product Create(Guid? Id, string name, Price price) {
             return new Product
             {
+                ID = Id.HasValue ? ProductId<Guid>.Of(Id.Value) : ProductId<Guid>.Of(Guid.NewGuid()),
                 Name = name,
                 Price = price
             };

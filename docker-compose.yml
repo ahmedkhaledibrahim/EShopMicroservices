@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d eshop"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d eshop-catalog"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,7 +25,7 @@ services:
     ports:
       - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d eshop"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d eshop-basket"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -95,6 +95,17 @@ services:
     build:
       context: .
       dockerfile: Discount.gRPC/Dockerfile
+  orderdb:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+
+  ordering.api:
+    image: ${DOCKER_REGISTRY-}orderingapi
+    depends_on:
+      orderdb:
+        condition: service_healthy  
+    build:
+      context: .
+      dockerfile: Ordering.Api/Dockerfile
 
 volumes:
   postgres_catalog_data:
@@ -103,4 +114,5 @@ volumes:
   redisinsight_data:
   discountdata:
    
+
 

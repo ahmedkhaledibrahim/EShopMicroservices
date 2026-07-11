@@ -64,6 +64,8 @@ namespace Ordering.Persistence.Configurations
                 paymentBuilder.Property(p => p.CVV).IsRequired().HasMaxLength(3);
                 paymentBuilder.Property(p => p.PaymentMethod).IsRequired();
             }); 
+
+            builder.HasMany(o => o.OrderItems).WithOne().HasForeignKey(oi => oi.OrderId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

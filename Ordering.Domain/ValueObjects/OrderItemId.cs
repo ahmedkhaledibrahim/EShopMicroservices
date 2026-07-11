@@ -1,6 +1,8 @@
-﻿namespace Ordering.Domain.ValueObjects
+﻿using Ordering.Domain.Abstractions;
+
+namespace Ordering.Domain.ValueObjects
 {
-    public record OrderItemId<T>
+    public record OrderItemId<T> : IIdentifier
     {
        
         public T Value { get; }

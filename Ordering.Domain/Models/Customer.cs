@@ -9,9 +9,10 @@ namespace Ordering.Domain.Models
         public string Name { get; private set; }
         public Email Email { get; private set; }
 
-        public static Customer Create(string name, Email email) {
+        public static Customer Create(Guid? Id,string name, Email email) {
             return new Customer
             {
+                ID = Id.HasValue ? CustomerId<Guid>.Of(Id.Value) : CustomerId<Guid>.Of(Guid.NewGuid()),
                 Email = email,
                 Name = name
             };

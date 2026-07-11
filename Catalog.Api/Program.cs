@@ -38,5 +38,4 @@ app.UseCors();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.MapCarter();
-
 app.Run();

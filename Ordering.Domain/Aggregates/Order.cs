@@ -28,16 +28,31 @@ namespace Ordering.Domain.Aggregates
             if (_orderItems.Any(x => x.ProductId == productId))
                 throw new DomainException("Product already exists in this order.");
 
-            var item = OrderItem.Create(productId,this.ID, price, quantity);
+            var item = OrderItem.Create(productId,this.ID, price, quantity, null);
 
             _orderItems.Add(item);
         }
 
         public void RemoveOrderItem(ProductId<Guid> productId) {
             var orderItem = _orderItems.FirstOrDefault(x => x.ProductId == productId);
-            if (orderItem != null) {
-                _orderItems.Remove(orderItem);
-            }
+            if (orderItem is null)
+                throw new DomainException("Product not found in this order.");
+
+            _orderItems.Remove(orderItem);
+        }
+
+        public void Update(
+            CustomerId<Guid> customerId,
+            OrderName orderName,
+            Address shippingAddress,
+            Address billingAddress,
+            Payment payment)
+        {
+            CustomerId = customerId;
+            OrderName = orderName;
+            ShippingAddress = shippingAddress;
+            BillingAddress = billingAddress;
+            Payment = payment;
         }
 
         public static Order Create(CustomerId<Guid> customerId,
