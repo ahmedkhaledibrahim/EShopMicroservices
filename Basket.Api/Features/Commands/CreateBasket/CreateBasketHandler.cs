@@ -1,4 +1,5 @@
-﻿using Basket.Api.Data.Entities;
+﻿using Basket.Api.Application.Exceptions;
+using Basket.Api.Data.Entities;
 using Basket.Api.Dtos;
 using Basket.Api.Repositories;
 using Discount.gRPC.Protos;
@@ -21,7 +22,10 @@ namespace Basket.Api.Features.Commands.CreateBasket
         public async Task<CreateBasketResponse> Handle(CreateBasketCommand request, CancellationToken cancellationToken)
         {
             var existingBasket =await _repository.GetShoppingCartAsync(request.Username);
-            if (existingBasket != null) { 
+            if (existingBasket != null) {
+                if (existingBasket.CheckoutStatus != CheckoutStatus.None) {
+                    throw new BadRequestException("basket is already being proccessed");
+                }
                await _repository.DeleteShoppingCartAsync(request.Username);
             }
             await CalculateDiscountAmounts(request.Items);

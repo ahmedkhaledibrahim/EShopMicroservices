@@ -1,4 +1,5 @@
-﻿using Basket.Api.Features.Commands.CreateBasket;
+﻿using Basket.Api.Features.Commands.BasketCheckout;
+using Basket.Api.Features.Commands.CreateBasket;
 using Basket.Api.Features.Queries.GetBasket;
 using Carter;
 using MediatR;
@@ -21,6 +22,11 @@ namespace Basket.Api.Modules
                 var result = await mediator.Send(command);
                 return Results.Ok(result);
             });
+            group.MapPost("/checkout", async (IMediator mediator, [FromBody] BasketCheckoutRequest request) => {
+                var result = await mediator.Send(request);
+                return Results.Ok(result);
+            }).Produces<Unit>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest);
         }
     }
 }

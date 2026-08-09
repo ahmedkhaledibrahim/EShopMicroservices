@@ -15,6 +15,9 @@ services:
       retries: 5
     volumes:
       - postgres_catalog_data:/var/lib/postgresql/data
+    networks:
+      - default
+      - microservices-net
   basket-postgres:
     image: postgres:16
     container_name: eshop-basket-postgres
@@ -31,6 +34,9 @@ services:
       retries: 5
     volumes:
       - postgres_basket_data:/var/lib/postgresql/data
+    networks:
+      - default
+      - microservices-net
   basket-redis:
     image: redis:latest
     container_name: eshop-basket-redis
@@ -40,6 +46,8 @@ services:
       - redis_data:/data
     command: redis-server --requirepass nopolice --appendonly yes
     restart: unless-stopped
+    networks:
+      - microservices-net
   basket-redis-insight:
     image: redis/redisinsight:latest
     container_name: basket-redis-insight
@@ -62,6 +70,8 @@ services:
     ports:
       - "6000:8080"
       - "6060:8080"
+    networks:
+      - microservices-net
   basket.api:
     image: ${DOCKER_REGISTRY-}basketapi
     environment:
@@ -79,6 +89,8 @@ services:
     ports:
       - "6061:8080"
       - "6001:8080"
+    networks:
+      - microservices-net
   pgadmin:
     image: dpage/pgadmin4
     container_name: eshop-pgadmin
@@ -95,8 +107,13 @@ services:
     build:
       context: .
       dockerfile: Discount.gRPC/Dockerfile
+    networks:
+      - microservices-net
   orderdb:
     image: mcr.microsoft.com/mssql/server:2025-latest
+    networks:
+      - default
+      - microservices-net
 
   ordering.api:
     image: ${DOCKER_REGISTRY-}orderingapi
@@ -106,13 +123,81 @@ services:
     build:
       context: .
       dockerfile: Ordering.Api/Dockerfile
+    networks:
+      - microservices-net
+  messagebroker:
+    image: rabbitmq:management
+    networks:
+      - default
+      - microservices-net
 
+  yarpgateway.api:
+    image: ${DOCKER_REGISTRY-}yarpgatewayapi
+    build:
+      context: .
+      dockerfile: YARPGateway.api/Dockerfile
+    depends_on:
+      catalog.api:
+        condition: service_started
+      basket.api:
+        condition: service_started
+      discount.grpc:
+        condition: service_started
+      ordering.api:
+        condition: service_started
+      users.api:
+        condition: service_started
+    ports:
+      - "7000:8080"
+    networks:
+      - microservices-net
+  mongodb:
+    image: mongo:latest
+    container_name: eshop-mongodb
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: nopolice
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - microservices-net
+  users.api:
+    image: ${DOCKER_REGISTRY-}usersapi
+    build:
+      context: .
+      dockerfile: Users.api/Dockerfile
+    environment:
+      - MongoDBSettings__ConnectionString=mongodb://admin:nopolice@mongodb:27017
+      - MongoDBSettings__DatabaseName=eshop-users
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - microservices-net
+
+networks:
+  microservices-net:
+    driver: bridge
 volumes:
   postgres_catalog_data:
   postgres_basket_data:
   redis_data:
   redisinsight_data:
   discountdata:
+  mongo_data:
    
+
+
 
 

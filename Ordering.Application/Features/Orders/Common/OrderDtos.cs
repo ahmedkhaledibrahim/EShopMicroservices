@@ -30,7 +30,7 @@ namespace Ordering.Application.Features.Orders.Common
     {
         public Guid ProductId { get; init; }
         public decimal Price { get; init; }
-        public string Currency { get; init; } = string.Empty;
+        public string Currency { get; init; } = "EGP";
         public int Quantity { get; init; }
     }
 }

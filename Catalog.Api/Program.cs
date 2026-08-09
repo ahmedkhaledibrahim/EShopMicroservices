@@ -16,7 +16,8 @@ builder.Services.AddMarten(options =>
     options.DatabaseSchemaName = "eshop";
     options.Schema.For<Product>().Identity(x => x.ID);
 }).UseDirtyTrackedSessions();
-if (builder.Environment.IsDevelopment()) {
+if (builder.Environment.IsDevelopment())
+{
     builder.Services.InitializeMartenWith(new InitialSeededData(InitialDataSets.products));
 }
 builder.Services.AddEndpointsApiExplorer();

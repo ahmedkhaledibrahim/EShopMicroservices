@@ -1,4 +1,6 @@
+using BuildingBlocks.Messaging.Events;
 using Mapster;
+using Ordering.Application.Features.Orders.Commands.CreateOrder;
 using Ordering.Application.Features.Orders.Common;
 using Ordering.Application.Features.Orders.Queries.GetOrders;
 using Ordering.Domain.Aggregates;
@@ -28,7 +30,8 @@ namespace Ordering.Application.MappingConfig
                 .Map(dest => dest.Id, src => src.ID.Value)
                 .Map(dest => dest.ProductId, src => src.ProductId.Value)
                 .Map(dest => dest.Price, src => src.Price.Value)
-                .Map(dest => dest.Currency, src => src.Price.Currency);
+                .Map(dest => dest.Currency, src => src.Price.Currency)
+                .Map(dest => dest.Quantity, src => src.Quantity);
 
             config.NewConfig<Order, OrderResponse>()
                  .MapWith(src => new OrderResponse {
@@ -42,6 +45,40 @@ namespace Ordering.Application.MappingConfig
                      Status = src.Status.ToString(),
                      TotalPrice = src.TotalPrice }
                  );
+            config.NewConfig<BasketCheckoutEvent, CreateOrderCommand>()
+                .MapWith(src => new CreateOrderCommand
+                {
+                    BillingAddress = new AddressDto
+                    {
+                        AddressLine = src.AddressLine,
+                        City = src.City,
+                        PostalCode = src.PostalCode,
+                        State = src.State
+                    },
+                    OrderItems = src.Items.Select(item => new OrderItemInputDto
+                    {
+                        ProductId = item.ProductId,
+                        Price = item.Price,
+                        Quantity = item.Quantity
+                    }).ToList(),
+                    OrderName = src.CustomerId.ToString() + "-" + DateTime.Now.ToString(),
+                    Payment = new PaymentDto
+                    {
+                        CardName = src.CardName,
+                        CardNumber = src.CardNumber,
+                        CVV = src.CVV,
+                        Expiration = src.Expiration,
+                        PaymentMethod = src.PaymentMethod
+                    },
+                    CustomerId = src.CustomerId,
+                    ShippingAddress = new AddressDto
+                    {
+                        AddressLine = src.AddressLine,
+                        City = src.City,
+                        PostalCode = src.PostalCode,
+                        State = src.State
+                    },
+                });
         }
     }
 }

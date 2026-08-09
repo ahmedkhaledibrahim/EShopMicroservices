@@ -15,6 +15,7 @@ namespace Ordering.Persistence.Data
         }
 
         public async Task SeedAsync() {
+            await _context.Database.MigrateAsync();
             if (await _context.Customers.AnyAsync())
             {
                 return;

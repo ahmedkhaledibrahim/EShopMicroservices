@@ -1,11 +1,15 @@
+using Basket.Api;
+using Basket.Api.Data.Entities;
 using Basket.Api.Data.Seeding;
 using Basket.Api.Extensions;
-using Basket.Api.Features.Commands.CreateBasket;
+using BuildingBlocks.Messaging.MassTransient;
 using Carter;
 using JasperFx;
 using Marten;
 using MediatR;
 using StackExchange.Redis;
+using System.Reflection;
+using Weasel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +20,10 @@ builder.Services.AddMarten(options =>
     options.Connection(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.AutoCreateSchemaObjects = AutoCreate.All;
     options.DatabaseSchemaName = "eshop";
+    options.UseSystemTextJsonForSerialization(enumStorage: EnumStorage.AsString);
+    options.Schema.For<ShoppingCart>()
+        .Duplicate(x => x.CheckoutStatus)
+        .Duplicate(x => x.CheckoutInitiatedAt);
 }).UseDirtyTrackedSessions();
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
@@ -40,8 +48,10 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+builder.Services.AddMessageBrokerServices(builder.Configuration, Assembly.GetExecutingAssembly());
 AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 var app = builder.Build();
+app.UseErrorHandlingMiddleware();
 app.UseCors();
 app.UseSwagger();
 app.UseSwaggerUI();
